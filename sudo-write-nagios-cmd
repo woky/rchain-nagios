@@ -1,0 +1,2 @@
+#!/bin/sh
+exec sudo -u nagios /opt/rchain-nagios/write-nagios-cmd

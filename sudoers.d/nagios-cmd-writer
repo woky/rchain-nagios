@@ -1,0 +1,1 @@
+nagios-cmd-writer ALL = (nagios) NOPASSWD: /opt/rchain-nagios/write-nagios-cmd
