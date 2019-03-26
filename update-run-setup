@@ -1,0 +1,51 @@
+#!/bin/bash
+set -e
+
+REPO_URL=https://github.com/rchain/rchain-nagios
+REPO_DIR=/opt/rchain-nagios
+GIT_CRYPT_KEY_FILE=/root/rchain-sre-git-crypt-key
+
+############################################################
+
+state_file="/var/cache/$(dirname $REPO_DIR)-setup-gitrev"
+cron_symlink="/etc/cron.hourly/$(dirname $REPO_DIR)-update-run-setup"
+
+if [[ ! -d $REPO_DIR ]]; then
+	export DEBIAN_FRONTEND=noninteractive
+	apt update
+	apt install -y --no-install-recommends git git-crypt cron
+	git clone $REPO_URL $REPO_DIR
+fi
+
+cd $REPO_DIR
+
+if ! git pull; then
+	echo "Failed to pull changes to $REPO_DIR" >&2
+	git status >&2
+fi
+
+if [[ -e $state_file ]]; then
+	curr_gitrev="$(git rev-parse --short HEAD)"
+	last_gitrev="$(cat $state_file)"
+	if [[ "$last_gitrev" == "$curr_gitrev" ]]; then
+		exit 0
+	fi
+fi
+
+if [[ -n "$GIT_CRYPT_KEY_FILE" ]]; then
+	( umask 077 && git-crypt unlock $GIT_CRYPT_KEY_FILE )
+fi
+
+if [[ ! $cron_symlink -ef update-run-setup ]]; then
+	ln -sf $REPO_DIR/update-run-setup $cron_symlink
+fi
+
+############################################################
+
+ret=0
+flock -x -n -E 77 $state_file ./run-setup || ret=$?
+case $ret in
+	0)  echo "$curr_gitrev" >$state_file ;;
+	77) echo "Another instance is running" >&2 ;;
+esac
+exit $ret

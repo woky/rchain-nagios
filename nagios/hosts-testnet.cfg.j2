@@ -1,0 +1,11 @@
+define hostgroup {
+	hostgroup_name testnet
+}
+{% for i in range(0, 10) %}
+
+define host {
+	use linux-server
+	host_name node{{ i }}.testnet.rchain-dev.tk
+	hostgroups testnet
+}
+{% endfor %}
