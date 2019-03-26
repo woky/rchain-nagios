@@ -2,7 +2,7 @@
 set -e
 
 export DEBIAN_FRONTEND=noninteractive
-apt install -y apache2 msmtp-mta nagios4 rsync
+apt install -y apache2 msmtp-mta nagios4 rsync s-nail
 a2enmod auth_digest
 install -C -m644 nagios4-cgi.conf -t /etc/apache2/conf-enabled/
 install -C -m640 -o nagios -g www-data secrets/htdigest.users -t /etc/nagios4/

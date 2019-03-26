@@ -1,0 +1,3 @@
+#!/bin/bash
+exec s-nail -S mta-arguments='-C /etc/nagios4/msmtprc -t' \
+	-r "Nagios <dev-bot@rchain.coop>" -s "$1" "$2"
