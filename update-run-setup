@@ -7,8 +7,8 @@ GIT_CRYPT_KEY_FILE=/root/rchain-sre-git-crypt-key
 
 ############################################################
 
-state_file="/var/cache/$(dirname $REPO_DIR)-setup-gitrev"
-cron_symlink="/etc/cron.hourly/$(dirname $REPO_DIR)-update-run-setup"
+state_file="/var/cache/$(basename $REPO_DIR)-setup-gitrev"
+cron_symlink="/etc/cron.hourly/$(basename $REPO_DIR)-update-run-setup"
 
 if [[ ! -d $REPO_DIR ]]; then
 	export DEBIAN_FRONTEND=noninteractive
