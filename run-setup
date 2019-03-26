@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+cd "$(dirname $0)"
 
 export DEBIAN_FRONTEND=noninteractive
 apt install -y apache2 msmtp-mta nagios4 rsync s-nail sudo
@@ -13,9 +14,4 @@ rsync -avh nagios/ /etc/nagios4/
 
 systemctl restart apache2 nagios4
 
-install -m750 -d /etc/sudoers.d
-install -C -m 600 sudoers.d/* /etc/sudoers.d
-
-if ! getent passwd nagios-cmd-writer >/dev/null; then
-	useradd -r -s /opt/rchain-nagios/sudo-write-nagios-cmd nagios-cmd-writer
-fi
+( cd cmd-writer && ./setup-user )

@@ -1,0 +1,16 @@
+#!/bin/bash
+set -e
+
+U=nagios-cmd-writer
+
+install -m750 -d /etc/sudoers.d
+install -C -m 600 sudoers.d/* /etc/sudoers.d/
+
+if ! getent passwd $U >/dev/null; then
+	useradd -r -s /home/$U/bin/sudo-write-nagios-cmd $U
+fi
+install -d /home/$U
+install -m750 -g $U -d /home/$U/.ssh
+install -C authorized_keys -t /home/$U/.ssh/
+install -d /home/$U/bin
+install -C bin/* -t /home/$U/bin/
