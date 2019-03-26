@@ -7,6 +7,6 @@ a2enmod auth_digest
 install -C -m644 nagios4-cgi.conf -t /etc/apache2/conf-enabled/
 install -C -m640 -o nagios -g www-data secrets/htdigest.users -t /etc/nagios4/
 install -C -m600 -o nagios secrets/msmtprc -t /etc/nagios4/
-#install -C -m644 nagios/objects/*.cfg -t /etc/nagios4/objects/
+install -C -m644 nagios/objects/*.cfg -t /etc/nagios4/objects/
 install -C -m644 nagios/conf.d/*.cfg -t /etc/nagios4/conf.d/
 systemctl restart apache2 nagios4
