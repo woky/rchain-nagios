@@ -39,3 +39,17 @@ define host {
 	use devnet-host
 	host_name validator-05.rchain-dev.tk
 }
+
+define service {
+	use generic-service
+	service_description tcp-port:40400
+	hostgroup_name devnet
+	check_command check_tcp!40400
+}
+
+define service {
+	use generic-service
+	service_description tcp-port:40404
+	hostgroup_name devnet
+	check_command check_tcp!40404
+}
