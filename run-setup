@@ -24,6 +24,8 @@ if ! dpkg -l nagios-api >/dev/null 2>&1; then
 	apt build-dep -y .
 	./build_deb.sh
 	apt install -y "$(ls ./dist/*.deb | sort | tail -1)"
+	sed -i 's|^DAEMON=.*|DAEMON=/opt/venvs/nagios-api/bin/nagios-api|' \
+		/etc/init.d/nagios-api
 	popd
 fi
 
