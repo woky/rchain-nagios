@@ -10,7 +10,7 @@ resource "google_compute_instance" "nagios_host" {
     }
   }
 
-  tags = [ "nagios", "http" ]
+  tags = [ "nagios", "nagios-api", "http" ]
 
   network_interface {
     network = "default"
