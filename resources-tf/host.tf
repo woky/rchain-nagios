@@ -14,7 +14,7 @@ resource "google_dns_record_set" "dns_record" {
 resource "google_compute_instance" "nagios_host" {
   name = "nagios"
   hostname = "nagios.rchain-dev.tk"
-  machine_type = "n1-highcpu-4"
+  machine_type = "n1-standard-1"
 
   boot_disk {
     initialize_params {
