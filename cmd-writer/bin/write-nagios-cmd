@@ -1,2 +1,0 @@
-#!/bin/sh
-exec cat >/var/lib/nagios4/rw/nagios.cmd
