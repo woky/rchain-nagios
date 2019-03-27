@@ -3,7 +3,7 @@ set -e
 cd "$(dirname $0)"
 
 export DEBIAN_FRONTEND=noninteractive
-apt install -y apache2 msmtp-mta nagios4 rsync s-nail sudo git
+apt install -yq apache2 msmtp-mta nagios4 rsync s-nail sudo git
 
 a2enmod auth_digest
 install -C -m644 nagios4-cgi.conf -t /etc/apache2/conf-enabled/
@@ -21,9 +21,9 @@ if ! dpkg -l nagios-api >/dev/null 2>&1; then
 	pushd /opt/nagios-api
 	git checkout master
 	git pull
-	apt build-dep -y .
+	apt build-dep -yq .
 	./build_deb.sh
-	apt install -y "$(ls ./dist/*.deb | sort | tail -1)"
+	apt install -yq "$(ls ./dist/*.deb | sort | tail -1)"
 	sed -i 's|^DAEMON=.*|DAEMON=/opt/venvs/nagios-api/bin/nagios-api|' \
 		/etc/init.d/nagios-api
 	popd
