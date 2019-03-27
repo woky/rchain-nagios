@@ -11,10 +11,11 @@ resource "google_compute_instance" "nagios_host" {
     }
   }
 
-  tags = [ "nagios", "nagios-api-in", "http" ]
+  tags = [ "nagios-api-in" ]
 
   network_interface {
     network = "default"
+    access_config {}
   }
 
   connection {
