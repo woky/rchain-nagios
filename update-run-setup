@@ -25,6 +25,7 @@ done
 if [[ ! -d $REPO_DIR ]]; then
 	export DEBIAN_FRONTEND=noninteractive
 	apt update
+	apt update
 	apt install -y --no-install-recommends git git-crypt cron
 	git clone $REPO_URL $REPO_DIR
 fi
