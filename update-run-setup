@@ -18,6 +18,7 @@ trap cleanup EXIT
 
 systemctl mask apt.systemd.daily.timer
 while systemctl is-active apt.systemd.daily.service >/dev/null 2>&1; do
+	echo "Waiting for apt.systemd.daily.service to finish"
 	sleep 1
 done
 
