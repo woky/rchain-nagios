@@ -1,6 +1,5 @@
 resource "google_compute_instance" "nagios_host" {
   name = "nagios"
-  hostname = "nagios.rchain-dev.tk"
   machine_type = "n1-standard-1"
 
   boot_disk {
