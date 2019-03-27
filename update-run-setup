@@ -10,6 +10,17 @@ GIT_CRYPT_KEY_FILE=/root/rchain-sre-git-crypt-key
 state_file="/var/cache/$(basename $REPO_DIR)-setup-gitrev"
 cron_symlink="/etc/cron.hourly/$(basename $REPO_DIR)-update-run-setup"
 
+cleanup()
+{
+	systemctl umask apt.systemd.daily.timer
+}
+trap cleanup EXIT
+
+systemctl mask apt.systemd.daily.timer
+while systemctl is-active apt.systemd.daily.service >/dev/null 2>&1; do
+	sleep 1
+done
+
 if [[ ! -d $REPO_DIR ]]; then
 	export DEBIAN_FRONTEND=noninteractive
 	apt update
