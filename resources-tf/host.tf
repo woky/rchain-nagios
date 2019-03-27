@@ -1,6 +1,6 @@
 resource "google_compute_instance" "nagios_host" {
   name = "nagios"
-  machine_type = "n1-standard-1"
+  machine_type = "n1-highcpu-4"
 
   boot_disk {
     initialize_params {
