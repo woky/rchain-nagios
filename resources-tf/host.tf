@@ -1,16 +1,3 @@
-resource "google_compute_address" "ext_addr" {
-  name = "nagios"
-  address_type = "EXTERNAL"
-}
-
-resource "google_dns_record_set" "dns_record" {
-  name = "nagios.rchain-dev.tk."
-  managed_zone = "rchain-dev"
-  type = "A"
-  ttl = 300
-  rrdatas = ["${google_compute_address.ext_addr.*.address[count.index]}"]
-}
-
 resource "google_compute_instance" "nagios_host" {
   name = "nagios"
   hostname = "nagios.rchain-dev.tk"
@@ -28,9 +15,6 @@ resource "google_compute_instance" "nagios_host" {
 
   network_interface {
     network = "default"
-    access_config {
-      nat_ip = "${google_compute_address.ext_addr.*.address[count.index]}"
-    }
   }
 
   connection {
