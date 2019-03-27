@@ -3,7 +3,7 @@ set -e
 cd "$(dirname $0)"
 
 export DEBIAN_FRONTEND=noninteractive
-apt install -y apache2 msmtp-mta nagios4 rsync s-nail sudo
+apt install -y apache2 msmtp-mta nagios4 rsync s-nail sudo git
 
 a2enmod auth_digest
 install -C -m644 nagios4-cgi.conf -t /etc/apache2/conf-enabled/
@@ -13,3 +13,20 @@ install -C -m600 -o nagios secrets/msmtprc -t /etc/nagios4/
 rsync -avh nagios/ /etc/nagios4/
 
 systemctl restart apache2 nagios4
+
+if ! dpkg -l nagios-api >/dev/null 2>&1; then
+	if [[ ! -d /opt/nagios-api ]]; then
+		git clone -n https://github.com/zorkian/nagios-api /opt/nagios-api
+	fi
+	pushd /opt/nagios-api
+	git checkout master
+	git pull
+	apt build-dep .
+	./build-dep
+	apt install "$(ls ./dist/*.deb | sort | tail -1)"
+	popd
+fi
+
+install -m644 nagios-api.rc /etc/default/nagios-api
+systemctl enable nagios-api
+systemctl restart nagios-api
