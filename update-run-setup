@@ -12,7 +12,7 @@ cron_symlink="/etc/cron.hourly/$(basename $REPO_DIR)-update-run-setup"
 
 cleanup()
 {
-	systemctl umask apt.systemd.daily.timer
+	systemctl unmask apt.systemd.daily.timer
 }
 trap cleanup EXIT
 
