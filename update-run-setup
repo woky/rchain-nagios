@@ -1,14 +1,38 @@
 #!/bin/bash
 set -e
 
-REPO_URL=https://github.com/rchain/rchain-nagios
-REPO_DIR=/opt/rchain-nagios
-GIT_CRYPT_KEY_FILE=/root/rchain-sre-git-crypt-key
+# Initialize main variables
 
-############################################################
+# The bootstrap script conditionally sourced below must check this
+# variable is not set before running us
+SETUP_SCRIPT_RUNNING=1
+
+if [[ -z "$REPO_DIR" ]]; then
+	if [[ -z "${BASH_SOURCE[0]}" ]]; then
+		if [[ -z "$REPO_URL" ]]; then
+			echo "REPO_URL must be set during bootstrap" >&2
+			exit 1
+		else
+			REPO_DIR="$(basename $REPO_URL)"
+		fi
+	else
+		# We're probably run by Cron
+		REPO_DIR="$(dirname $(readlink -e ${BASH_SOURCE[0]}))"
+		source "$REPO_DIR/bootstrap"
+	fi
+fi
+
+if [[ ! -d "$REPO_DIR" && -z "$REPO_URL" ]]; then
+	echo "REPO_DIR=$REPO_DIR does not exist and REPO_URL is empty" >&2
+	exit 1
+fi
+
+# Initialize other variables
 
 state_file="/var/cache/$(basename $REPO_DIR)-setup-gitrev"
 cron_symlink="/etc/cron.hourly/$(basename $REPO_DIR)-update-run-setup"
+
+# Make sure we don't conflict with apt.systemd.daily
 
 cleanup()
 {
@@ -22,20 +46,24 @@ while systemctl is-active apt.systemd.daily.service >/dev/null 2>&1; do
 	sleep 1
 done
 
+# Install our dependencies
+
+export DEBIAN_FRONTEND=noninteractive
+# after boot apt often fails to find git-crypt after single apt update
+apt update -q ; apt update -q
+apt install -yq --no-install-recommends git git-crypt cron
+
+# Clone or update main Git repositoriy
+
 if [[ ! -d $REPO_DIR ]]; then
-	export DEBIAN_FRONTEND=noninteractive
-	apt update
-	apt update
-	apt install -y --no-install-recommends git git-crypt cron
-	git clone $REPO_URL $REPO_DIR
+	git clone -n $REPO_URL $REPO_DIR
 fi
 
 cd $REPO_DIR
+git checkout "${REPO_BRANCH:-master}"
+git pull
 
-if ! git pull; then
-	echo "Failed to pull changes to $REPO_DIR" >&2
-	git status >&2
-fi
+# Exit if setup from latest Git ref has been run already
 
 if [[ -e $state_file ]]; then
 	curr_gitrev="$(git rev-parse --short HEAD)"
@@ -45,15 +73,19 @@ if [[ -e $state_file ]]; then
 	fi
 fi
 
+# Unlock Git repository if necessary
+
 if [[ -n "$GIT_CRYPT_KEY_FILE" ]]; then
 	( umask 077 && git-crypt unlock $GIT_CRYPT_KEY_FILE )
 fi
+
+# Install Cron job
 
 if [[ ! $cron_symlink -ef update-run-setup ]]; then
 	ln -sf $REPO_DIR/update-run-setup $cron_symlink
 fi
 
-############################################################
+# Run main setup script exclusively
 
 ret=0
 flock -x -n -E 77 $state_file ./run-setup || ret=$?
