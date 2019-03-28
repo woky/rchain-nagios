@@ -34,17 +34,21 @@ cron_symlink="/etc/cron.hourly/$(basename $REPO_DIR)-update-run-setup"
 
 # Make sure we don't conflict with apt.systemd.daily
 
+mask_services='apt-daily apt-daily-upgrade'
+
 cleanup()
 {
-	systemctl unmask apt.systemd.daily.timer
+	systemctl unmask $mask_services
 }
 trap cleanup EXIT
 
-systemctl mask apt.systemd.daily.timer
-while systemctl is-active apt.systemd.daily.service >/dev/null 2>&1; do
-	echo "Waiting for apt.systemd.daily.service to finish"
+systemctl mask $mask_services
+
+echo -n "Waiting for following services to finish: $mask_services... "
+while systemctl is-active $mask_services >/dev/null 2>&1; do
 	sleep 1
 done
+echo "OK"
 
 # Install our dependencies
 
