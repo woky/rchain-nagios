@@ -69,8 +69,8 @@ git pull
 
 # Exit if setup from latest Git ref has been run already
 
+curr_gitrev="$(git rev-parse --short HEAD)"
 if [[ -e $state_file ]]; then
-	curr_gitrev="$(git rev-parse --short HEAD)"
 	last_gitrev="$(cat $state_file)"
 	if [[ "$last_gitrev" == "$curr_gitrev" ]]; then
 		exit 0
