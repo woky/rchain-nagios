@@ -4,6 +4,7 @@ cd "$(dirname $0)"
 
 export DEBIAN_FRONTEND=noninteractive
 apt install -yq apache2 msmtp-mta nagios4 rsync s-nail sudo git
+rm -f /etc/nagios-plugins/config/http.cfg
 
 a2enmod auth_digest
 install -C -m644 nagios4-cgi.conf -t /etc/apache2/conf-enabled/
