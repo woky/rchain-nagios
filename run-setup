@@ -11,10 +11,11 @@ install -C -m644 nagios4-cgi.conf -t /etc/apache2/conf-enabled/
 
 install -C -m640 -o nagios -g www-data secrets/htdigest.users -t /etc/nagios4/
 install -C -m600 -o nagios secrets/msmtprc -t /etc/nagios4/
+install -C -m644 usr.bin.msmtp -t /etc/apparmor.d/local/
 rm /etc/nagios-plugins/config/http.cfg || true
 rsync -avh nagios/ /etc/nagios4/
 
-systemctl restart apache2 nagios4
+systemctl restart apparmor apache2 nagios4
 
 if ! dpkg -l nagios-api >/dev/null 2>&1; then
 	if [[ ! -d /opt/nagios-api ]]; then
