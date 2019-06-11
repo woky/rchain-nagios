@@ -19,6 +19,7 @@ resource "google_compute_instance" "nagios_host" {
 
   connection {
     type = "ssh"
+    host = self.network_interface.0.access_config.0.nat_ip
     user = "root"
     private_key = "${file("~/.ssh/google_compute_engine")}"
   }
